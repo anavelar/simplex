@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Assinaturas das funcoes
+void ImprimeMatrizParaTeste(int **mat, int n, int m);
+
+// Programa
 int main()
 {
   int i;
@@ -9,8 +13,8 @@ int main()
   int n,m;
   int** mat;
 
-  // Inicio: construcao da Estrutura de Dados
-  // ----------------------------------------
+  // PASSO 1: Construcao da Estrutura de Dados
+  // -----------------------------------------
   // Cria a matriz
   scanf("%d %d ", &n, &m);
   mat = (int **) malloc( (n+2) * sizeof(int*) );
@@ -42,7 +46,7 @@ int main()
     //Matriz Identidade da matriz extendida
     for(i=0; i<n; i++)
       mat[linha][i] = 0;
-    mat[linha][linha-1] = 1;
+    mat[linha][linha-2] = 1;
 
     //Matriz A
     for(i=n; i<(n+m); i++)
@@ -62,13 +66,45 @@ int main()
     scanf("%d ", &(mat[linha][m+(3*n)]) );
   }
 
-  //Criar função de impressao so pra testar a leitura
+  // PASSO 2: Checa se b < 0
+  // -----------------------------------------
+  for(linha=2; linha<(n+2); linha++){
+    if(mat[linha][m+(3*n)] < 0){
+      //Inverte a linha toda, menos a matriz I da Auxiliar
+      for(i=0; i<(m+(2*n)); i++)
+        mat[linha][i] *= (-1);
+      mat[linha][m+(3*n)] *= (-1);
+    }
+  }
+
+  ImprimeMatrizParaTeste(mat, n, m);
 
   //Ao fim: Desalocar a matriz
+  // Depois: colocar tudo em float + questao 7 casas decimais
+  // Tratar teste 2: matrizes não entram linearmente independentes.
+  // [Ver nas anotações aqui se tem mais algo para tratar, se precisar.]
   return 0;
 }
 
-/*
+/* AUX
 for(i=; i<; i++)
   mat[][] = ;
 */
+
+// Funcoes
+
+// No codigo:
+// ImprimeMatrizParaTeste(mat, n, m);
+void ImprimeMatrizParaTeste(int **mat, int n, int m){
+
+  int i, linha;
+
+  printf("MATRIZ:\n");
+
+  for(linha=0; linha<(n+2); linha++){
+    for(i=0; i< (m+(3*n)+1); i++)
+      printf("%d\t", mat[linha][i]);
+    printf("\n");
+  }
+
+}
