@@ -1,93 +1,74 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//Assinaturas das funcoes aqui acho: testar
-int EpossivelMelhorar (float** eVetorCusto, int** eNaoBase, int numVariaveis);
-
 int main()
 {
-  int i,j;
-  int indiceid;
+  int i;
+  int linha; //j
 
-  int numRestricoes;
-  int numVariaveis;
-  float* vetorCusto;
-  float** ab;
-  int* base;
-  int* naobase;
+  int n,m;
+  int** mat;
 
-  // 1 - Leitura dos dados e PL em FPI
-  scanf("%d %d\n", &numRestricoes, &numVariaveis);
+  // Inicio: construcao da Estrutura de Dados
+  // ----------------------------------------
+  // Cria a matriz
+  scanf("%d %d ", &n, &m);
+  mat = (int **) malloc( (n+2) * sizeof(int*) );
+  for(i=0; i<(n+2); i++)
+    mat[i] = (int *) malloc( (m+(3*n)+1) * sizeof (int) );
 
-  //Vetor Custo, com valor objetivo da PL no final
-  vetorCusto = (float*) malloc((numVariaveis+numRestricoes+1)*(sizeof(float)));
-  for(i=0; i<numVariaveis; i++){
-    scanf("%f ", &(vetorCusto[i]));
+  // 1a linha: Vetor de custos -c
+  for(i=0; i<n; i++)
+    mat[0][i] = 0;
+  for(i=n; i<(n+m); i++){
+    scanf("%d ", &(mat[0][i]) );
+    mat[0][i] = mat[0][i] * (0-1) ;
   }
-  for(i=numVariaveis; i<(numVariaveis+numRestricoes); i++){
-    vetorCusto[i] = 0;
-  }
-  vetorCusto[numVariaveis+numRestricoes] = 0;
+  for(i=(n+m); i<(m+(3*n)+1); i++)
+    mat[0][i] = 0;
 
-  //Matriz Ab, ja construida incluindo as variaveis de folga
-  indiceid = numVariaveis;
-  ab = (float**) malloc(numRestricoes*sizeof(float*));
-  for(i=0; i<numRestricoes; i++){
-    ab[i] = (float*) malloc((numRestricoes+numVariaveis+1)*sizeof(float));
+  // 2a linha: Vetor de custos da matriz extendida, da PL Auxiliar em FPI
+  // e valor objetivo
+  for(i=0; i<( m+(2*n) ); i++)
+    mat[1][i] = 0;
+  for(i=(m+(2*n)); i<( m+(3*n) ); i++)
+    mat[1][i] = 1;
+  mat[1][m+(3*n)] = 0;
 
-    for(j=0; j<numVariaveis; j++){
-      scanf("%f ", &(ab[i][j]));
-    }
+  // Outras linhas: Matriz extendida, A em FPI, PL Auxiliar e vetor b
+  // Cada linha:
+  for(linha=2; linha<(n+2); linha++){
 
-    for(j=numVariaveis; j<(numVariaveis+numRestricoes); j++){
-      if(j != indiceid){
-        ab[i][j] = 0;
-      }else{
-        ab[i][j] = 1;
-      }
-    }
-    indiceid++;
+    //Matriz Identidade da matriz extendida
+    for(i=0; i<n; i++)
+      mat[linha][i] = 0;
+    mat[linha][linha-1] = 1;
 
-    scanf("%f ", &ab[i][numVariaveis+numRestricoes]);
-  }
+    //Matriz A
+    for(i=n; i<(n+m); i++)
+      scanf("%d ", &(mat[linha][i]) );
 
-  // ****** CUIDADO COM ERRO
-  // 2 - Colocar a PL em forma canonica
-  // Ja esta: so definir a base e nao base aqui
-  base = (int*) malloc(numRestricoes*sizeof(int));
-  for(i=0; i<numRestricoes; i++){
-    base[i] = numVariaveis + i;
-  }
+    // A em FPI: completa com matriz Identidade
+    for(i=(n+m); i<( m+(2*n) ); i++)
+      mat[linha][i] = 0;
+    mat[linha][m+n+(linha-2)] = 1;
 
-  naobase = (int*) malloc(numVariaveis*sizeof(int));
-  for(i=0; i<numVariaveis; i++){
-    naobase[i] = i;
+    // Matriz Identidade da PL Auxiliar
+    for(i=( m+(2*n) ); i<( m+(3*n) ); i++)
+      mat[linha][i] = 0;
+    mat[linha][m+(2*n)+(linha-2)] = 1;
+
+    // Vetor b
+    scanf("%d ", &(mat[linha][m+(3*n)]) );
   }
 
-  // 4 - Ve se tem como melhorar a solucao basica: via funcao
-  // (funcao porque vai repetir infinitamente)
-  int EpossivelMelhorar(&vetorCusto, &naobase, numVariaveis);
+  //Criar função de impressao so pra testar a leitura
 
-
-  //Impressao ao fim: numeros devem ser escritos com no maximo
-  // 7 casas decimais
-  //Ao fim:desalocar estruturas como vetor custo, ab...
+  //Ao fim: Desalocar a matriz
   return 0;
 }
 
-// FUNCOES
-
-// PASSO 4
-int EpossivelMelhorar (float** eVetorCusto, int** eNaoBase, int numVariaveis)
-{
-  int i;
-
-  // Percorre Cn
-  for(i=0; i<numVariaveis; i++){
-    if( (*eVetorCusto)[(*eNaoBase)[i]] > 0 ){
-      return ((*eNaoBase)[i]);
-    }
-  }
-
-  return (-1);
-}
+/*
+for(i=; i<; i++)
+  mat[][] = ;
+*/
