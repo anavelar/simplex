@@ -3,7 +3,8 @@
 
 // Assinaturas das funcoes
 void ImprimeMatrizParaTeste(int **mat, int n, int m);
-void ImprimeBaseCanonica(int* b, int n);
+void ImprimeBaseCanonica(int* B, int n);
+void PreparaAuxiliarParaSimplex(int** mat, int n, int m, int* B);
 
 // Programa
 int main()
@@ -13,9 +14,7 @@ int main()
 
   int n,m;
   int** mat;
-  int* b; //base
-
-  int aux;
+  int* B;    //Colunas na base canonica
 
   // PASSO 1: Construcao da Estrutura de Dados
   // -----------------------------------------
@@ -67,14 +66,14 @@ int main()
       mat[linha][i] = 0;
     mat[linha][m+(2*n)+(linha-2)] = 1;
 
-    // Vetor b
+    // Vetor de coeficientes b
     scanf("%d ", &(mat[linha][m+(3*n)]) );
   }
 
-  // Vetor que armazena quem e a base canonica da vez
-  b = (int*) malloc( n*(sizeof(int)) );
+  // Vetor que armazena colunas na base canonica da vez
+  B = (int*) malloc( n*(sizeof(int)) );
 
-  // PASSO 2: Checa se b < 0
+  // PASSO 2: Checa se coeficientes b < 0
   // -----------------------
 
   for(linha=2; linha<(n+2); linha++){
@@ -89,8 +88,12 @@ int main()
   // PASSO 3: Vê se a PL é viável: Simplex na PL Auxiliar
   // ----------------------------------------------------
 
+  PreparaAuxiliarParaSimplex(mat, n, m, B);
 
-  //Ao fim: Desalocar a matriz, desalocar vetor base (b)
+  // Construir o simplex com deteccao de ilimitada inclusa
+  // Nunca vai dar ilimitada na PL Auxiliar porque ela eh viavel sempre.
+
+  //Ao fim: Desalocar a matriz, desalocar vetor base
   // Depois: colocar tudo em float + questao 7 casas decimais
   // Tratar teste 2: matrizes não entram linearmente independentes.
   // [Ver nas anotações aqui se tem mais algo para tratar, se precisar.]
@@ -108,7 +111,31 @@ for(i=; i<; i++)
 // Chamada no codigo:
 // Testes
 // ImprimeMatrizParaTeste(mat, n, m);
-// ImprimeBaseCanonica(b, n);
+// ImprimeBaseCanonica(B, n);
+
+// Coloca a base em forma canonica: Ab = I ok, agora Cb = 0:
+void PreparaAuxiliarParaSimplex(int** mat, int n, int m, int* B){
+
+  int i, j;
+  int aux;
+
+  // Define a base canônica: na PL Auxiliar ela sempre começa
+  // da identidade à direita
+  aux =  = m+n;
+  for(i=0; i<n; i++){
+    aux++;
+    B[i] = aux;
+  }
+
+  // Coloca em forma canonica: Ab = I ok, agora Cb = 0
+  for(i=0; i<n; i++){
+    for(j=0; j<(m+(3*n)+1); j++){
+      mat[1][j] -= mat[i+2][j];
+    }
+  }
+
+  return;
+}
 
 void ImprimeMatrizParaTeste(int **mat, int n, int m){
 
@@ -125,12 +152,12 @@ void ImprimeMatrizParaTeste(int **mat, int n, int m){
   return;
 }
 
-void ImprimeBaseCanonica(int* b, int n){
+void ImprimeBaseCanonica(int* B, int n){
 
   printf("B = ");
 
   for(int i=0; i<n; i++)
-    printf("%d ", b[i]);
+    printf("%d ", B[i]);
 
   printf("\n");
 
