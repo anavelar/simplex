@@ -3,6 +3,7 @@
 
 // Assinaturas das funcoes
 void ImprimeMatrizParaTeste(int **mat, int n, int m);
+void ImprimeBaseCanonica(int* b, int n);
 
 // Programa
 int main()
@@ -12,9 +13,13 @@ int main()
 
   int n,m;
   int** mat;
+  int* b; //base
+
+  int aux;
 
   // PASSO 1: Construcao da Estrutura de Dados
   // -----------------------------------------
+
   // Cria a matriz
   scanf("%d %d ", &n, &m);
   mat = (int **) malloc( (n+2) * sizeof(int*) );
@@ -66,8 +71,12 @@ int main()
     scanf("%d ", &(mat[linha][m+(3*n)]) );
   }
 
+  // Vetor que armazena quem e a base canonica da vez
+  b = (int*) malloc( n*(sizeof(int)) );
+
   // PASSO 2: Checa se b < 0
-  // -----------------------------------------
+  // -----------------------
+
   for(linha=2; linha<(n+2); linha++){
     if(mat[linha][m+(3*n)] < 0){
       //Inverte a linha toda, menos a matriz I da Auxiliar
@@ -77,12 +86,15 @@ int main()
     }
   }
 
-  ImprimeMatrizParaTeste(mat, n, m);
+  // PASSO 3: Vê se a PL é viável: Simplex na PL Auxiliar
+  // ----------------------------------------------------
 
-  //Ao fim: Desalocar a matriz
+
+  //Ao fim: Desalocar a matriz, desalocar vetor base (b)
   // Depois: colocar tudo em float + questao 7 casas decimais
   // Tratar teste 2: matrizes não entram linearmente independentes.
   // [Ver nas anotações aqui se tem mais algo para tratar, se precisar.]
+
   return 0;
 }
 
@@ -93,8 +105,11 @@ for(i=; i<; i++)
 
 // Funcoes
 
-// No codigo:
+// Chamada no codigo:
+// Testes
 // ImprimeMatrizParaTeste(mat, n, m);
+// ImprimeBaseCanonica(b, n);
+
 void ImprimeMatrizParaTeste(int **mat, int n, int m){
 
   int i, linha;
@@ -107,4 +122,17 @@ void ImprimeMatrizParaTeste(int **mat, int n, int m){
     printf("\n");
   }
 
+  return;
+}
+
+void ImprimeBaseCanonica(int* b, int n){
+
+  printf("B = ");
+
+  for(int i=0; i<n; i++)
+    printf("%d ", b[i]);
+
+  printf("\n");
+
+  return;
 }
