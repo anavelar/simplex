@@ -1,2 +1,2 @@
 #!/bin/bash
-./simplex < $1 > $2
+./executavel < $1 > $2
