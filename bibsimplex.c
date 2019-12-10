@@ -3,7 +3,7 @@
 // Testes
 // -----
 
-void ImprimeMatriz(int **mat, int n, int m){
+void ImprimeMatriz(float **mat, int n, int m){
 
   int i, linha;
 
@@ -12,7 +12,7 @@ void ImprimeMatriz(int **mat, int n, int m){
   for(linha=0; linha<(n+2); linha++){
 
     for(i=0; i< (m+(3*n)+1); i++)
-      printf("%d\t", mat[linha][i]);
+      printf("%.7f\t", mat[linha][i]);
 
     printf("\n");
 
@@ -38,7 +38,7 @@ void ImprimeBaseCanonica(int* B, int n){
 // Funcoes mesmo
 // -------------
 
-void PreencheMatriz(int** mat, int n, int m){
+void PreencheMatriz(float** mat, int n, int m){
 
   int i;
   int linha;  //j
@@ -47,7 +47,7 @@ void PreencheMatriz(int** mat, int n, int m){
   for(i=0; i<n; i++)
     mat[0][i] = 0;
   for(i=n; i<(n+m); i++){
-    scanf("%d ", &(mat[0][i]) );
+    scanf("%f ", &(mat[0][i]) );
     mat[0][i] = mat[0][i] * (0-1) ;
   }
   for(i=(n+m); i<(m+(3*n)+1); i++)
@@ -72,7 +72,7 @@ void PreencheMatriz(int** mat, int n, int m){
 
     //Matriz A
     for(i=n; i<(n+m); i++)
-      scanf("%d ", &(mat[linha][i]) );
+      scanf("%f ", &(mat[linha][i]) );
 
     // A em FPI: completa com matriz Identidade
     for(i=(n+m); i<( m+(2*n) ); i++)
@@ -85,7 +85,7 @@ void PreencheMatriz(int** mat, int n, int m){
     mat[linha][m+(2*n)+(linha-2)] = 1;
 
     // Vetor de coeficientes b
-    scanf("%d ", &(mat[linha][m+(3*n)]) );
+    scanf("%f ", &(mat[linha][m+(3*n)]) );
   }
 
   return;
@@ -93,7 +93,7 @@ void PreencheMatriz(int** mat, int n, int m){
 
 // Quando os coneficientes b da matriz b de coeficientes forem negativos,
 // inverte a linha (multiplica por -1)-(Menos a matriz I da PL Auxiliar Claro)
-void EliminaBnegativos(int** mat, int n, int m){
+void EliminaBnegativos(float** mat, int n, int m){
 
   int linha;
 
@@ -111,11 +111,11 @@ void EliminaBnegativos(int** mat, int n, int m){
 
 // Na PL Auxiliar, define quem sera a base canonica e coloca a base
 // em formato canonico: Ab = I e Cb = 0.
-void PreparaPLParaSimplex(int** mat, int n, int m, int* B, int tipoPL){
+void PreparaPLParaSimplex(float** mat, int n, int m, int* B, int tipoPL){
 
   int i, j;
   int aux;
-  int multiplicador;
+  float multiplicador;
 
   if(tipoPL == PL_AUXILIAR){
     // Define a base canonica: na PL Auxiliar ela sempre começa
@@ -191,12 +191,12 @@ void PreparaPLParaSimplex(int** mat, int n, int m, int* B, int tipoPL){
   }
 }
 
-// Internas ao Simplex na PL Auxiliar
-// ----------------------------------
+// Internas ao Simplex
+// -------------------
 
 // Procura por Cn positivo no vetor de custos
 // Retorna a coluna da matriz com cn que permite melhorar
-int EncontraFormaDeOtimizar(int** mat, int n, int m, int tipoPL){
+int EncontraFormaDeOtimizar(float** mat, int n, int m, int tipoPL){
 
   int i;
   int inicioColunasPL, fimColunasPL, ondec;
@@ -226,7 +226,7 @@ int EncontraFormaDeOtimizar(int** mat, int n, int m, int tipoPL){
 
 // Nao tem mais como melhorar a PL. Isto tem diferente significado
 // de acordo com o tipo da PL.
-int AnalisaResultado(int** mat, int n, int m, int tipoPL){
+int AnalisaResultado(float** mat, int n, int m, int tipoPL){
 
   if(tipoPL == PL_AUXILIAR){
 
@@ -247,7 +247,7 @@ int AnalisaResultado(int** mat, int n, int m, int tipoPL){
 }
 
 // Percorre a coluna Ak para ver se a PL eh ilimitada
-int ChecaSeEilimitada(int k, int** mat, int n){
+int ChecaSeEilimitada(int k, float** mat, int n){
 
   for(int i=2; i<(n+2); i++){
     if(mat[i][n-1+k] > 0)
@@ -258,16 +258,21 @@ int ChecaSeEilimitada(int k, int** mat, int n){
 }
 
 // Escolhe o elemento a ser pivoteado - retorna a linha de Ak
-int EscolhePivot(int cn, int** mat, int n, int m){
+int EscolhePivot(int cn, float** mat, int n, int m){
 
-  int min = INT_MAX;
+  int linhaMin = INT_MAX;
+  float min = FLT_MAX;
 
-  for(int i=2; i<(n+2); i++)
-    if( (mat[i][m+(3*n)] > 0) && (mat[i][n-1+cn] > 0) )
-      if( (mat[i][m+(3*n)] / mat[i][n-1+cn]) < min )
-        min = i-1; //linha de Ak
+  for(int i=2; i<(n+2); i++){
+    if( (mat[i][m+(3*n)] > 0) && (mat[i][n-1+cn] > 0) ){
+      if( (mat[i][m+(3*n)] / mat[i][n-1+cn]) < min ){
+        min = (mat[i][m+(3*n)] / mat[i][n-1+cn]);
+        linhaMin = i-1; //linha de Ak
+      }
+    }
+  }
 
-  return min;
+  return linhaMin;
 }
 
 // Inclui novo elemento selecionado na base canônica
@@ -279,10 +284,10 @@ void TrocaBase(int* B, int cn, int linha){
 }
 
 // Para colocar a PL em forma canonica de acordo com nova base:Ab = I e Cb = 0
-void PivoteiaParaFormaCanonica(int cn, int linha, int** mat, int n, int m){
+void PivoteiaParaFormaCanonica(int cn, int linha, float** mat, int n, int m){
 
   int i,j;
-  int multiplicador;
+  float multiplicador;
 
   // Primeiro: transformar o elemento pivot em 1
   mat[linha+1][n-1+cn] = (mat[linha+1][n-1+cn] / mat[linha+1][n-1+cn]);
@@ -322,8 +327,8 @@ void PivoteiaParaFormaCanonica(int cn, int linha, int** mat, int n, int m){
   return;
 }
 
-// Simplex Executado na PL Auxiliar
-int Simplex(int** mat, int n, int m, int* B, int tipoPL){
+// Simplex
+int Simplex(float** mat, int n, int m, int* B, int tipoPL){
 
   int cn;     // Indice teorico
   int linha;  // Indice teorico
@@ -352,12 +357,12 @@ int Simplex(int** mat, int n, int m, int* B, int tipoPL){
 
     PivoteiaParaFormaCanonica(cn, linha, mat, n, m);
 
-    return ( Simplex( mat, n, m, B, PL_AUXILIAR) );
+    return ( Simplex( mat, n, m, B, tipoPL) );
   }
 }
 
 // Imprime o resultado do Simplex executado
-void ImprimeResultadoFinal(int resultado, int** mat, int n, int m, int* B, int cn){
+void ImprimeResultadoFinal(int resultado, float** mat, int n, int m, int* B, int cn){
 
   int i, j;
 
@@ -366,7 +371,7 @@ void ImprimeResultadoFinal(int resultado, int** mat, int n, int m, int* B, int c
     case INVIAVEL:
       printf("inviavel\n");
       for(i=0; i<n; i++)
-        printf("%d ", mat[1][i]);
+        printf("%.7f ", mat[1][i]);
       break;
 
     case ILIMITADA:
@@ -376,32 +381,32 @@ void ImprimeResultadoFinal(int resultado, int** mat, int n, int m, int* B, int c
         // se eh variavel basica
         for(j=1; j<(n+1); j++){
           if(i == B[j-1]){
-            printf("%d ", mat[j+1][m+(3*n)]);
+            printf("%.7f ", mat[j+1][m+(3*n)]);
             break;
           }
         }
         // se eh variavel nao basica
         if(j == (n+1))
-          printf("0 ");
+          printf("0.0000000 ");
       }
       printf("\n");
       // Certificado de Ilimitada:
       for(i=1; i<(m+1); i++){
         if(i == cn){
-          printf("1 ");
+          printf("1.0000000 ");
         }
         else
         {
           // se eh variavel basica
           for(j=1; j<(n+1); j++){
             if(i == B[j-1]){
-              printf("%d ", ((-1) * mat[j+1][n-1+cn]));
+              printf("%.7f ", ((-1) * mat[j+1][n-1+cn]));
               break;
             }
           }
           // se eh variavel nao basica
           if(j == (n+1))
-            printf("0 ");
+            printf("0.0000000 ");
         }
       }
       break;
@@ -409,25 +414,25 @@ void ImprimeResultadoFinal(int resultado, int** mat, int n, int m, int* B, int c
     case OTIMA:
       printf("otima\n");
       // Valor Objetivo:
-      printf("%d\n", mat[1][m+(3*n)]);
+      printf("%.7f\n", mat[1][m+(3*n)]);
       // Uma Solucao Otima : solucao basica dela ----- sem as variaveis de folga?**********
       // Analisa cada coluna de A (eliminando as variaveis de folga)
       for(i=1; i<(m+1); i++){
         // Procura essa coluna na base
         for(j=1; j<(n+1); j++){
           if(B[j-1] == i){
-            printf("%d ", mat[j+1][m+(3*n)]);
+            printf("%.7f ", mat[j+1][m+(3*n)]);
             break;
           }
         }
         // Se nao esta na base:
         if(j == (n+1))
-          printf("0 ");
+          printf("0.0000000 ");
       }
       printf("\n");
       // Certificado de Otimalidade:
       for(i=0; i<n; i++)
-        printf("%d ", mat[1][i]);
+        printf("%.7f ", mat[1][i]);
       break;
   }
 

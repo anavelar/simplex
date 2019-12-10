@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <float.h>
 
 #define NAO 0
 #define SIM 1
@@ -19,22 +20,22 @@
 // Funcoes
 
 // --- Testes
-void ImprimeMatriz(int **mat, int n, int m);
+void ImprimeMatriz(float **mat, int n, int m);
 void ImprimeBaseCanonica(int* B, int n);
 
 // --- Reais
-void PreencheMatriz(int** mat, int n, int m);
-void EliminaBnegativos(int** mat, int n, int m);
-// Simplex na PL Auxiliar:
-void PreparaPLParaSimplex(int** mat, int n, int m, int* B, int tipoPL);
-int EncontraFormaDeOtimizar(int** mat, int n, int m, int tipoPL);
-int AnalisaResultado(int** mat, int n, int m, int tipoPL);
-int ChecaSeEilimitada(int k, int** mat, int n);
-int EscolhePivot(int cn, int** mat, int n, int m);
+void PreencheMatriz(float** mat, int n, int m);
+void EliminaBnegativos(float** mat, int n, int m);
+// Simplex:
+void PreparaPLParaSimplex(float** mat, int n, int m, int* B, int tipoPL);
+int EncontraFormaDeOtimizar(float** mat, int n, int m, int tipoPL);
+int AnalisaResultado(float** mat, int n, int m, int tipoPL);
+int ChecaSeEilimitada(int k, float** mat, int n);
+int EscolhePivot(int cn, float** mat, int n, int m);
 void TrocaBase(int* B, int cn, int linha);
-void PivoteiaParaFormaCanonica(int cn, int linha, int** mat, int n, int m);
-int Simplex(int** mat, int n, int m, int* B, int tipoPL);
+void PivoteiaParaFormaCanonica(int cn, int linha, float** mat, int n, int m);
+int Simplex(float** mat, int n, int m, int* B, int tipoPL);
 // Resultado Final
-void ImprimeResultadoFinal(int resultado, int** mat, int n, int m, int* B, int cn);
+void ImprimeResultadoFinal(int resultado, float** mat, int n, int m, int* B, int cn);
 
 #endif

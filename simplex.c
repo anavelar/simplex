@@ -6,7 +6,7 @@ int main()
   int linha; //j
 
   int n,m;
-  int** mat;
+  float** mat;
   int* B;    //Colunas na base canonica
 
   int resultado = INT_MAX;
@@ -15,9 +15,9 @@ int main()
 
   // Cria a matriz - PL extendida, PL em FPI e PL Auxiliar na matriz
   scanf("%d %d ", &n, &m);
-  mat = (int **) malloc( (n+2) * sizeof(int*) );
+  mat = (float **) malloc( (n+2) * sizeof(float*) );
   for(i=0; i<(n+2); i++)
-    mat[i] = (int *) malloc( (m+(3*n)+1) * sizeof (int) );
+    mat[i] = (float *) malloc( (m+(3*n)+1) * sizeof (float) );
   PreencheMatriz(mat, n, m);
 
   // Cria o vetor colunas na base canonica
