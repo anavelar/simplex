@@ -196,12 +196,28 @@ void PreparaPLParaSimplex(int** mat, int n, int m, int* B, int tipoPL){
 
 // Procura por Cn positivo no vetor de custos
 // Retorna a coluna da matriz com cn que permite melhorar
-int EncontraFormaDeOtimizar(int** mat, int n, int m){
+int EncontraFormaDeOtimizar(int** mat, int n, int m, int tipoPL){
 
   int i;
+  int inicioColunasPL, fimColunasPL, ondec;
 
-  for(i=1; i<(m+(2*n)+1); i++){
-    if( mat[1][n-1+i] < 0 )
+  if(tipoPL == PL_AUXILIAR){
+
+    inicioColunasPL = 1;
+    fimColunasPL = m+(2*n);
+    ondec = 1;
+  }
+  else {
+
+    if(tipoPL == PL_NORMAL){
+      inicioColunasPL = 1;
+      fimColunasPL = m+n;
+      ondec = 0;
+    }
+  }
+
+  for(i=inicioColunasPL; i<(fimColunasPL+1); i++){
+    if( mat[ondec][n-1+i] < 0 )
       return i;
   }
 
@@ -285,7 +301,7 @@ void PivoteiaParaFormaCanonica(int cn, int linha, int** mat, int n, int m){
 }
 
 // Simplex Executado na PL Auxiliar
-int SimplexAuxiliar(int** mat, int n, int m, int* B){
+int Simplex(int** mat, int n, int m, int* B, int tipoPL){
 
   int cn;     // Indice teorico
   int linha;  // Indice teorico
@@ -294,7 +310,7 @@ int SimplexAuxiliar(int** mat, int n, int m, int* B){
   // Entrou uma PL em formato canonico, Ab = I e Cb = 0, e base dela B.
 
   // 1. Procura Cn para melhorar a solucao
-  cn = EncontraFormaDeOtimizar(mat, n, m);
+  cn = EncontraFormaDeOtimizar(mat, n, m, tipoPL);
 
   if (cn == 0){ //Nao tem mais como otimizar com o Simplex
     //Verifica o valor objetivo
@@ -328,7 +344,7 @@ int SimplexAuxiliar(int** mat, int n, int m, int* B){
     PivoteiaParaFormaCanonica(cn, linha, mat, n, m);
 
     // ******************** PODE ESTAR AQUI TB
-    return ( SimplexAuxiliar( mat, n, m, B) );
+    return ( Simplex( mat, n, m, B, PL_AUXILIAR) );
   }
 }
 

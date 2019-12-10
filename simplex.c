@@ -29,15 +29,18 @@ int main()
   // PASSO 3: Vê se a PL é viável: Simplex na PL Auxiliar
   PreparaPLParaSimplex(mat, n, m, B, PL_AUXILIAR);
 
-  resultado = SimplexAuxiliar(mat, n, m, B);
+  resultado = Simplex(mat, n, m, B, PL_AUXILIAR);
 
   if(resultado == INVIAVEL){
 
     // A PL eh inviavel: imprime resultado e certificado e finaliza execucao
-    ImprimeResultadoFinal(ehviavel, mat, n);
+    ImprimeResultadoFinal(resultado, mat, n);
+
     // Desaloca as coisassssssssssssss ***********************************************
     return 0;
+
   }else{
+
     if(resultado == VIAVEL){
       // PASSO 4: Se a PL eh viavel, ve se tem otimo ou se eh ilimitada:
       // Simplex na PL mesmo
