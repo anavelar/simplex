@@ -28,6 +28,7 @@ int EncontraFormaDeOtimizar(int** mat, int n, int m);
 int ChecaSeEilimitada(int k, int** mat, int n);
 int EscolhePivot(int cn, int** mat, int n, int m);
 void TrocaBase(int* B, int cn, int linha);
+void PivoteiaParaFormaCanonica(int cn, int linha, int** mat, int n, int m);
 int SimplexAuxiliar(int** mat, int n, int m, int* B);
 // Resultado Final
 void ImprimeResultadoFinal(int resultado, int** mat, int n);

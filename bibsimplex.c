@@ -3,16 +3,21 @@
 // Testes
 // -----
 
-void ImprimeMatrizParaTeste(int **mat, int n, int m){
+void ImprimeMatriz(int **mat, int n, int m){
 
   int i, linha;
 
   printf("MATRIZ:\n");
 
   for(linha=0; linha<(n+2); linha++){
+
     for(i=0; i< (m+(3*n)+1); i++)
       printf("%d\t", mat[linha][i]);
+
     printf("\n");
+
+    if(linha < 2)
+      printf("\n");
   }
 
   return;
@@ -123,6 +128,9 @@ void PreparaPLAuxiliarParaSimplex(int** mat, int n, int m, int* B){
   for(i=0; i<n; i++){
     for(j=0; j<(m+(3*n)+1); j++){
       mat[1][j] -= mat[i+2][j];
+      // Vetor de custos real:
+      if( (j>(n-1)) && (j<(m+(2*n))) )
+        mat[0][j] -= mat[i+2][j];
     }
   }
 
@@ -139,7 +147,7 @@ int EncontraFormaDeOtimizar(int** mat, int n, int m){
   int i;
 
   for(i=1; i<(m+(2*n)+1); i++){
-    if( mat[1][(n-1)+i] < 0 )
+    if( mat[1][n-1+i] < 0 )
       return i;
   }
 
@@ -178,36 +186,82 @@ void TrocaBase(int* B, int cn, int linha){
   return;
 }
 
+// Para colocar a PL em forma canonica de acordo com nova base:Ab = I e Cb = 0
+void PivoteiaParaFormaCanonica(int cn, int linha, int** mat, int n, int m){
+
+  int i,j;
+  int multiplicador;
+
+  // Primeiro: transformar o elemento pivot em 1
+  mat[linha+1][n-1+cn] = (mat[linha+1][n-1+cn] / mat[linha+1][n-1+cn]);
+
+  // Segundo: faz Cb = 0 (Ck = 0)
+  multiplicador = (-1) * mat[1][n-1+cn];
+  for(j=0; j<(m+(3*n)+1); j++){
+    mat[1][j] += (multiplicador * mat[linha+1][j]);
+
+    //Vetor custos tb:
+    if( (j>(n-1)) && (j<(m+(2*n))) )
+      mat[0][j] += (multiplicador * mat[linha+1][j]);
+  }
+
+  // Terceiro: Ab = I (Ak = Coluna da Identidade que caiu para ela)
+  for(i=2; i<(n+2); i++){
+    if(i != (linha+1)){
+      // Para Cada Linha
+      if(mat[i][n-1+cn] > 0){
+        multiplicador = mat[i][n-1+cn];
+        for(j=0; j<(m+(3*n)+1); j++)
+          mat[i][j] -= (multiplicador * mat[linha+1][j]);
+      }
+      else
+      {
+        if(mat[i][n-1+cn] < 0){
+          multiplicador = ((-1) * mat[i][n-1+cn]);
+          for(j=0; j<(m+(3*n)+1); j++)
+            mat[i][j] += (multiplicador *  mat[linha+1][j]);
+        }
+        // else: if(mat[i][n-1+cn] == 0)
+        // ai nao precisa mexer nessa linha.
+      }
+    }
+  }
+
+  return;
+}
+
 // Simplex Executado na PL Auxiliar
 int SimplexAuxiliar(int** mat, int n, int m, int* B){
 
-  int cn;
+  int cn;     // Indice teorico
+  int linha;  // Indice teorico
   int ehIlimitada;
-  int linha;
 
   // Entrou uma PL em formato canonico, Ab = I e Cb = 0, e base dela B.
 
   // 1. Procura Cn para melhorar a solucao
-  cn = 0;
   cn = EncontraFormaDeOtimizar(mat, n, m);
 
   if (cn == 0){ //Nao tem mais como otimizar com o Simplex
     //Verifica o valor objetivo
     if( mat[1][m+(3*n)] < 0 ) // PL Aux inviavel
       return INVIAVEL;
-    else{
+    else
       if(mat[1][m+(3*n)] == 0) // PL Aux viavel
         return VIAVEL;
-    }
-  }else // Existe cn otimizavel, coluna salva na variavel cn
+  }
+  else // Existe cn otimizavel, coluna salva na variavel cn
   {
-    // Não usado na PL Auxiliar: checar se a PL eh ilimitada
+    // 2. (Não usado na PL Auxiliar) checar se a PL eh ilimitada
     ehIlimitada = ChecaSeEilimitada(cn, mat, n);
     if(ehIlimitada == SIM){
       // Nao tratar no caso de PL Auxiliar:
       // Elas sao sempre viaveis e com solucao otima.
       // No caso de Simplex p PL Normal age (retorna
       // do simplex para imprimir e finalizar).
+
+      //teste
+      printf("EH ILIMITADA.\n");
 
       // return ILIMITADA;
       // E TRATA LA FORA
@@ -217,9 +271,10 @@ int SimplexAuxiliar(int** mat, int n, int m, int* B){
     linha = EscolhePivot(cn, mat, n, m);
     TrocaBase(B, cn, linha);
 
-    //PivoteiaParaFormaCanonica(cn, linha, mat, n, m, B);
+    PivoteiaParaFormaCanonica(cn, linha, mat, n, m);
 
-
+    // ******************** PODE ESTAR AQUI TB
+    return ( SimplexAuxiliar( mat, n, m, B) );
   }
 }
 

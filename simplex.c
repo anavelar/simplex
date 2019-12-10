@@ -37,6 +37,8 @@ int main()
     return 0;
   }else{
     if(ehviavel == VIAVEL){
+      //teste
+      printf("otima ou ilimitada\n");
       // Chama o simplex da PL normal pra PL normal:
       // A PL eh ilimitada ou otima
     }
@@ -53,20 +55,20 @@ int main()
   // Tratar teste 2: matrizes não entram linearmente independentes.
   // [Ver nas anotações aqui se tem mais algo para tratar, se precisar.]
 
-  //teste de execucao
-  printf("Acabou, executou, falous.\n");
-
   return 0;
 }
+
+/* ------ Testes
+// Testes:
+printf("Etapa tal\n");
+ImprimeMatriz(mat, n, m);
+ImprimeBaseCanonica(B, n);
+*/
 
 /* ---- AUX
 ---------------------
 for(i=; i<; i++)
   mat[][] = ;
----------------------
-// Testes:
-// ImprimeMatriz(mat, n, m);
-// ImprimeBaseCanonica(B, n);
 -------------------
 IDEIA: primeiro o simplex funciona para PL Auxiliar, depois funciona para PL
 Normal adaptado, se for o caso 2, uma coisa de cada vez.
