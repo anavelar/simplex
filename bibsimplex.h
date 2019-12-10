@@ -28,12 +28,13 @@ void EliminaBnegativos(int** mat, int n, int m);
 // Simplex na PL Auxiliar:
 void PreparaPLParaSimplex(int** mat, int n, int m, int* B, int tipoPL);
 int EncontraFormaDeOtimizar(int** mat, int n, int m, int tipoPL);
+int AnalisaResultado(int** mat, int n, int m, int tipoPL);
 int ChecaSeEilimitada(int k, int** mat, int n);
 int EscolhePivot(int cn, int** mat, int n, int m);
 void TrocaBase(int* B, int cn, int linha);
 void PivoteiaParaFormaCanonica(int cn, int linha, int** mat, int n, int m);
 int Simplex(int** mat, int n, int m, int* B, int tipoPL);
 // Resultado Final
-void ImprimeResultadoFinal(int resultado, int** mat, int n);
+void ImprimeResultadoFinal(int resultado, int** mat, int n, int m, int* B, int cn);
 
 #endif

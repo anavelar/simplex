@@ -28,34 +28,31 @@ int main()
 
   // PASSO 3: Vê se a PL é viável: Simplex na PL Auxiliar
   PreparaPLParaSimplex(mat, n, m, B, PL_AUXILIAR);
-
   resultado = Simplex(mat, n, m, B, PL_AUXILIAR);
 
   if(resultado == INVIAVEL){
-
     // A PL eh inviavel: imprime resultado e certificado e finaliza execucao
-    ImprimeResultadoFinal(resultado, mat, n);
-
-    // Desaloca as coisassssssssssssss ***********************************************
+    ImprimeResultadoFinal(resultado, mat, n, m, B, 0);
     return 0;
-
   }else{
-
     if(resultado == VIAVEL){
       // PASSO 4: Se a PL eh viavel, ve se tem otimo ou se eh ilimitada:
       // Simplex na PL mesmo
 
       PreparaPLParaSimplex(mat, n, m, B, PL_NORMAL);
+      resultado = Simplex(mat, n, m, B, PL_NORMAL);
 
-      //resultado = Simplex();
-
+      if(resultado == ILIMITADA){
+        return 0;
+      }else
+      {
+        if(resultado == OTIMA){
+          ImprimeResultadoFinal(resultado, mat, n, m, B, 0);
+          return 0;
+        }
+      }
     }
   }
-
-
-  // Construir o simplex com deteccao de ilimitada inclusa
-  // Nunca vai dar ilimitada na PL Auxiliar porque ela eh viavel sempre.
-  // SimplexAuxiliar();
 
   //Ao fim: Desalocar a matriz, desalocar vetor base
   // Depois: colocar tudo em float + questao 7 casas decimais

@@ -224,6 +224,28 @@ int EncontraFormaDeOtimizar(int** mat, int n, int m, int tipoPL){
   return 0;
 }
 
+// Nao tem mais como melhorar a PL. Isto tem diferente significado
+// de acordo com o tipo da PL.
+int AnalisaResultado(int** mat, int n, int m, int tipoPL){
+
+  if(tipoPL == PL_AUXILIAR){
+
+    //Verifica o valor objetivo
+    if( mat[1][m+(3*n)] < 0 )
+      return INVIAVEL;
+
+    else{
+      if(mat[1][m+(3*n)] == 0)
+        return VIAVEL;
+    }
+  }else{
+
+    if(tipoPL == PL_NORMAL)
+      return OTIMA;
+  }
+
+}
+
 // Percorre a coluna Ak para ver se a PL eh ilimitada
 int ChecaSeEilimitada(int k, int** mat, int n){
 
@@ -312,29 +334,16 @@ int Simplex(int** mat, int n, int m, int* B, int tipoPL){
   // 1. Procura Cn para melhorar a solucao
   cn = EncontraFormaDeOtimizar(mat, n, m, tipoPL);
 
-  if (cn == 0){ //Nao tem mais como otimizar com o Simplex
-    //Verifica o valor objetivo
-    if( mat[1][m+(3*n)] < 0 ) // PL Aux inviavel
-      return INVIAVEL;
-    else
-      if(mat[1][m+(3*n)] == 0) // PL Aux viavel
-        return VIAVEL;
+  if (cn == 0){     //Nao tem mais como otimizar com o Simplex
+    return ( AnalisaResultado(mat, n, m, tipoPL) );
   }
   else // Existe cn otimizavel, coluna salva na variavel cn
   {
-    // 2. (Não usado na PL Auxiliar) checar se a PL eh ilimitada
+    // 2. Checa se a PL eh ilimitada
     ehIlimitada = ChecaSeEilimitada(cn, mat, n);
     if(ehIlimitada == SIM){
-      // Nao tratar no caso de PL Auxiliar:
-      // Elas sao sempre viaveis e com solucao otima.
-      // No caso de Simplex p PL Normal age (retorna
-      // do simplex para imprimir e finalizar).
-
-      //teste
-      printf("EH ILIMITADA.\n");
-
-      // return ILIMITADA;
-      // E TRATA LA FORA
+      ImprimeResultadoFinal(ILIMITADA, mat, n, m, B, cn);
+      return ILIMITADA;
     }
 
     // Caso nao seja ilimitada:
@@ -343,28 +352,82 @@ int Simplex(int** mat, int n, int m, int* B, int tipoPL){
 
     PivoteiaParaFormaCanonica(cn, linha, mat, n, m);
 
-    // ******************** PODE ESTAR AQUI TB
     return ( Simplex( mat, n, m, B, PL_AUXILIAR) );
   }
 }
 
 // Imprime o resultado do Simplex executado
-void ImprimeResultadoFinal(int resultado, int** mat, int n){
+void ImprimeResultadoFinal(int resultado, int** mat, int n, int m, int* B, int cn){
+
+  int i, j;
 
   switch(resultado){
 
     case INVIAVEL:
       printf("inviavel\n");
-      for(int i=0; i<n; i++)
+      for(i=0; i<n; i++)
         printf("%d ", mat[1][i]);
       break;
 
     case ILIMITADA:
-      //DO
+      printf("ilimitada\n");
+      // Uma Solucao
+      for(i=1; i<(m+1); i++){
+        // se eh variavel basica
+        for(j=1; j<(n+1); j++){
+          if(i == B[j-1]){
+            printf("%d ", mat[j+1][m+(3*n)]);
+            break;
+          }
+        }
+        // se eh variavel nao basica
+        if(j == (n+1))
+          printf("0 ");
+      }
+      printf("\n");
+      // Certificado de Ilimitada:
+      for(i=1; i<(m+1); i++){
+        if(i == cn){
+          printf("1 ");
+        }
+        else
+        {
+          // se eh variavel basica
+          for(j=1; j<(n+1); j++){
+            if(i == B[j-1]){
+              printf("%d ", ((-1) * mat[j+1][n-1+cn]));
+              break;
+            }
+          }
+          // se eh variavel nao basica
+          if(j == (n+1))
+            printf("0 ");
+        }
+      }
       break;
 
     case OTIMA:
-      //DO
+      printf("otima\n");
+      // Valor Objetivo:
+      printf("%d\n", mat[1][m+(3*n)]);
+      // Uma Solucao Otima : solucao basica dela ----- sem as variaveis de folga?**********
+      // Analisa cada coluna de A (eliminando as variaveis de folga)
+      for(i=1; i<(m+1); i++){
+        // Procura essa coluna na base
+        for(j=1; j<(n+1); j++){
+          if(B[j-1] == i){
+            printf("%d ", mat[j+1][m+(3*n)]);
+            break;
+          }
+        }
+        // Se nao esta na base:
+        if(j == (n+1))
+          printf("0 ");
+      }
+      printf("\n");
+      // Certificado de Otimalidade:
+      for(i=0; i<n; i++)
+        printf("%d ", mat[1][i]);
       break;
   }
 
