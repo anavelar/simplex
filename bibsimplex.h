@@ -8,6 +8,9 @@
 #define NAO 0
 #define SIM 1
 
+#define PL_AUXILIAR 0
+#define PL_NORMAL 1
+
 #define INVIAVEL 0
 #define VIAVEL 1
 #define ILIMITADA 2
@@ -23,7 +26,7 @@ void ImprimeBaseCanonica(int* B, int n);
 void PreencheMatriz(int** mat, int n, int m);
 void EliminaBnegativos(int** mat, int n, int m);
 // Simplex na PL Auxiliar:
-void PreparaPLAuxiliarParaSimplex(int** mat, int n, int m, int* B);
+void PreparaPLParaSimplex(int** mat, int n, int m, int* B, int tipoPL);
 int EncontraFormaDeOtimizar(int** mat, int n, int m);
 int ChecaSeEilimitada(int k, int** mat, int n);
 int EscolhePivot(int cn, int** mat, int n, int m);

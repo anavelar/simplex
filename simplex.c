@@ -9,7 +9,7 @@ int main()
   int** mat;
   int* B;    //Colunas na base canonica
 
-  int ehviavel = INT_MAX;
+  int resultado = INT_MAX;
 
   // PASSO 1: Construcao da Estrutura de Dados
 
@@ -27,20 +27,25 @@ int main()
   EliminaBnegativos(mat, n, m);
 
   // PASSO 3: Vê se a PL é viável: Simplex na PL Auxiliar
-  PreparaPLAuxiliarParaSimplex(mat, n, m, B);
+  PreparaPLParaSimplex(mat, n, m, B, PL_AUXILIAR);
 
-  ehviavel = SimplexAuxiliar(mat, n, m, B);
+  resultado = SimplexAuxiliar(mat, n, m, B);
 
-  if(ehviavel == INVIAVEL){
+  if(resultado == INVIAVEL){
+
+    // A PL eh inviavel: imprime resultado e certificado e finaliza execucao
     ImprimeResultadoFinal(ehviavel, mat, n);
-    // Desaloca as coisassssssssssssss
+    // Desaloca as coisassssssssssssss ***********************************************
     return 0;
   }else{
-    if(ehviavel == VIAVEL){
-      //teste
-      printf("otima ou ilimitada\n");
-      // Chama o simplex da PL normal pra PL normal:
-      // A PL eh ilimitada ou otima
+    if(resultado == VIAVEL){
+      // PASSO 4: Se a PL eh viavel, ve se tem otimo ou se eh ilimitada:
+      // Simplex na PL mesmo
+
+      PreparaPLParaSimplex(mat, n, m, B, PL_NORMAL);
+
+      //resultado = Simplex();
+
     }
   }
 
@@ -50,9 +55,9 @@ int main()
   // SimplexAuxiliar();
 
   //Ao fim: Desalocar a matriz, desalocar vetor base
-  // Ao fim de tudo: modularizar mais.
   // Depois: colocar tudo em float + questao 7 casas decimais
   // Tratar teste 2: matrizes não entram linearmente independentes.
+  // Teste 4 da seg fault para PL Auxuliar, antes de fazer PL Original
   // [Ver nas anotações aqui se tem mais algo para tratar, se precisar.]
 
   return 0;

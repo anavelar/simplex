@@ -111,30 +111,84 @@ void EliminaBnegativos(int** mat, int n, int m){
 
 // Na PL Auxiliar, define quem sera a base canonica e coloca a base
 // em formato canonico: Ab = I e Cb = 0.
-void PreparaPLAuxiliarParaSimplex(int** mat, int n, int m, int* B){
+void PreparaPLParaSimplex(int** mat, int n, int m, int* B, int tipoPL){
 
   int i, j;
   int aux;
+  int multiplicador;
 
-  // Define a base canonica: na PL Auxiliar ela sempre começa
-  // da identidade à direita
-  aux = m+n;
-  for(i=0; i<n; i++){
-    aux++;
-    B[i] = aux;
+  if(tipoPL == PL_AUXILIAR){
+    // Define a base canonica: na PL Auxiliar ela sempre começa
+    // da identidade à direita
+    aux = m+n;
+    for(i=0; i<n; i++){
+      aux++;
+      B[i] = aux;
+    }
+
+    // Coloca em forma canonica: Ab = I ok, agora Cb = 0
+    for(i=0; i<n; i++){
+      for(j=0; j<(m+(3*n)+1); j++){
+        mat[1][j] -= mat[i+2][j];
+        // Vetor de custos real:
+        if( (j>(n-1)) && (j<(m+(2*n))) )
+          mat[0][j] -= mat[i+2][j];
+      }
+    }
+
+    return;
   }
+  else
+  {
+    if(tipoPL == PL_NORMAL){
+      // Ja temos a base canonica, precisamos Cb = 0 para iniciar o simplex.
 
-  // Coloca em forma canonica: Ab = I ok, agora Cb = 0
-  for(i=0; i<n; i++){
-    for(j=0; j<(m+(3*n)+1); j++){
-      mat[1][j] -= mat[i+2][j];
-      // Vetor de custos real:
-      if( (j>(n-1)) && (j<(m+(2*n))) )
-        mat[0][j] -= mat[i+2][j];
+      // Checa se todos custos da base B estao iguais a zero
+      for(i=0; i<n; i++){
+
+        // Para cada coluna na Base:
+        if( mat[0][n-1+B[i]] != 0 ){
+
+          // Custo < 0
+          if( mat[0][n-1+B[i]] < 0 ){
+
+            multiplicador = ( (-1) * (mat[0][n-1+B[i]]) );
+
+            // Para a PL extendida:
+            for(j=0; j<n; j++)
+              mat[1][j] += (multiplicador * mat[i+2][j]) ; //*************
+            // Para C:
+            for(j=n; j<(m+(2*n)); j++)
+              mat[0][j] += (multiplicador * mat[i+2][j]);
+            // Para vetor de coeficientes b:
+            mat[1][m+(3*n)] += ( multiplicador * mat[i+2][m+(3*n)] );
+
+          }
+          else // Custo > 0 ou Custo == 0
+          {
+            // Custo > 0
+            if( mat[0][n-1+B[i]] > 0 ){
+
+              multiplicador = mat[0][n-1+B[i]];
+
+              // Para a PL extendida:
+              for(j=0; j<n; j++)
+                mat[1][j] -= (multiplicador * mat[i+2][j]) ; //*************
+              // Para C:
+              for(j=n; j<(m+(2*n)); j++)
+                mat[0][j] -= (multiplicador * mat[i+2][j]);
+              // Para vetor de coeficientes b:
+              mat[1][m+(3*n)] -= ( multiplicador * mat[i+2][m+(3*n)] );
+
+            }
+            // else: if( mat[0][n-1+B[i]] == 0 ): ai nao precisa fazer nada.
+          }
+        }
+        //else: Se esse custo for zero, nao precisa fazer nada.
+
+      }
     }
   }
-
-  return;
 }
 
 // Internas ao Simplex na PL Auxiliar
